@@ -23,7 +23,7 @@
   "apps": [
     {
       "name": "lisk-export",
-      "script": "./runner.js",
+      "script": "./runner.js"
     }
   ]
 }
