@@ -1,0 +1,29 @@
+{
+  "name": "lisk-export",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "micro",
+    "dev": "micro-dev"
+  },
+  "dependencies": {
+    "json2csv": "^4.0.2",
+    "lisk-js": "^0.5.1",
+    "micro": "^9.1.4",
+    "microrouter": "^3.1.1"
+  },
+  "devDependencies": {
+    "micro-dev": "^2.2.2"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "apps": [
+    {
+      "name": "lisk-export",
+      "script": "./runner.js",
+    }
+  ]
+}
