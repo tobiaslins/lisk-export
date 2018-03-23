@@ -8,6 +8,7 @@
     "dev": "micro-dev"
   },
   "dependencies": {
+    "bignumber.js": "^6.0.0",
     "json2csv": "^4.0.2",
     "lisk-js": "^0.5.1",
     "micro": "^9.1.4",
