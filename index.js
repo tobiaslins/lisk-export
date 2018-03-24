@@ -1,47 +1,58 @@
 const lisk = require('lisk-js')
-const json2csv = require('json2csv').parse
+const BigNumber = require('bignumber.js')
+const QueryStream = require('pg-query-stream')
+const csv = require('fast-csv')
+
+const { DateTime } = require('luxon')
 const { send } = require('micro')
 const { router, get } = require('microrouter')
-const BigNumber = require('bignumber.js')
+const { Pool } = require('pg')
 
-const fromRawLsk = value => (
+const config = require('./config')
+const sqlQuery = require('./query')
+
+const { getStartOfYear, getEndOfYear } = require('./helper')
+
+const pool = new Pool(config)
+
+const fromRawLsk = value =>
   new BigNumber(value || 0).dividedBy(new BigNumber(10).pow(8)).toFixed()
-)
+
+const convertTimestamp = ts =>
+  new DateTime.fromISO(
+    new Date((1464109200 + ts) * 1000).toISOString()
+  ).toFormat('yyyy-MM-dd hh:mm:ss')
 
 module.exports = router(
   get('/:address', async (req, res) => {
     const { address } = req.params
-    const { limit = 200, delimiter = ';' } = req.query
+    const { delimiter = ';', year = 2018 } = req.query
     if (address.includes('favicon')) return ''
 
-    return new Promise((resolve, reject) => {
-      lisk.api().listTransactions(address, limit, 0, data => {
-        res.setHeader('Content-Type', 'application/octet-stream')
-        res.setHeader(
-          'Content-Disposition',
-          `attachment; filename=lisk_transactions_${address}.csv`
-        )
-        const transactions = data.transactions.map(({id, height, blockId, timestamp, senderId, recipientId, amount, fee, confirmations}) => ({
-          id,
-          height,
-          blockId,
-          timestamp,
-          senderId,
-          recipientId,
-          amount: fromRawLsk(amount),
-          fee: fromRawLsk(fee),
-          confirmations
-        }))
-        try {
-          const csv = json2csv(transactions, {
-            delimiter
-          })
-          resolve(csv)
-        } catch (err) {
-          console.error(err)
-          reject('Something went wrong')
-        }
-      })
+    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=lisk_txs_${address}_${year}.csv`
+    )
+
+    const query = new QueryStream(sqlQuery, [
+      address,
+      getStartOfYear(year),
+      getEndOfYear(year)
+    ])
+    const csvStream = csv.createWriteStream({
+      headers: true,
+      objectMode: true,
+      delimiter,
+      transform(row) {
+        row.timestamp = convertTimestamp(row.timestamp)
+        row.amount = fromRawLsk(row.amount)
+        row.fee = fromRawLsk(row.fee)
+        return row
+      }
     })
+
+    const client = await pool.connect()
+    return client.query(query).pipe(csvStream)
   })
 )

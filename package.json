@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "bignumber.js": "^6.0.0",
-    "json2csv": "^4.0.2",
+    "fast-csv": "^2.4.1",
     "lisk-js": "^0.5.1",
+    "luxon": "^0.5.8",
     "micro": "^9.1.4",
-    "microrouter": "^3.1.1"
+    "microrouter": "^3.1.1",
+    "pg": "^7.4.1",
+    "pg-query-stream": "^1.1.1"
   },
   "devDependencies": {
     "micro-dev": "^2.2.2"
