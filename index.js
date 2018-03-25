@@ -18,15 +18,15 @@ const pool = new Pool(config)
 const fromRawLsk = value =>
   new BigNumber(value || 0).dividedBy(new BigNumber(10).pow(8)).toFixed()
 
-const convertTimestamp = ts =>
-  new DateTime.fromISO(
-    new Date((1464109200 + ts) * 1000).toISOString()
-  ).toFormat('yyyy-MM-dd hh:mm:ss')
+const convertTimestamp = (ts, zone) =>
+  new DateTime.fromISO(new Date((1464109200 + ts) * 1000).toISOString())
+    .setZone(zone)
+    .toFormat('yyyy-MM-dd hh:mm:ss')
 
 module.exports = router(
   get('/:address', async (req, res) => {
     const { address } = req.params
-    const { delimiter = ';', year = 2018 } = req.query
+    const { delimiter = ';', year = 2018, timezone = 'UTC' } = req.query
     if (address.includes('favicon')) return ''
 
     res.setHeader('Content-Type', 'application/octet-stream')
@@ -45,7 +45,7 @@ module.exports = router(
       objectMode: true,
       delimiter,
       transform(row) {
-        row.timestamp = convertTimestamp(row.timestamp)
+        row.timestamp = convertTimestamp(row.timestamp, timezone)
         row.amount = fromRawLsk(row.amount)
         row.fee = fromRawLsk(row.fee)
         return row
