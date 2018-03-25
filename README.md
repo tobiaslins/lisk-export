@@ -18,6 +18,15 @@ By default it exports all transactions from current year (2018) , this can also 
 https://export.lisk.ws/17890508407355636952L?delimiter=%2C&year=2017
 ```
 
+#### Custom timezone
+
+It is possible to overwrite the custom `timezone` which is set to `UTC` to default.
+Just append the `timezone` parameter with the timezone you are in. You can lookup them here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+```
+https://export.lisk.ws/17890508407355636952L?timezone=Europe/Paris
+```
+
 ### Support me
 
 Of course feel free to support my work by voting for [`elevate`](https://explorer.lisk.io/delegate/17890508407355636952L) or simply donating a small amount! :)
