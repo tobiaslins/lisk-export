@@ -53,6 +53,12 @@ module.exports = router(
     })
 
     const client = await pool.connect()
-    return client.query(query).pipe(csvStream)
+
+    const stream = client.query(query)
+    stream.on('end', () => {
+      console.log('End stream')
+      client.end()
+    })
+    return stream.pipe(csvStream)
   })
 )
