@@ -24,6 +24,10 @@ const convertTimestamp = (ts, zone) =>
     .toFormat('yyyy-MM-dd hh:mm:ss')
 
 module.exports = router(
+  get('/test', async (req, res) => {
+    await pool.end()
+    return 'success'
+  }),
   get('/:address', async (req, res) => {
     const { address } = req.params
     const { delimiter = ';', year = 2018, timezone = 'UTC' } = req.query
@@ -57,7 +61,7 @@ module.exports = router(
     const stream = client.query(query)
     stream.on('end', () => {
       console.log('End stream')
-      client.end()
+      client.release()
     })
     return stream.pipe(csvStream)
   })
