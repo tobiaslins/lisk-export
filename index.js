@@ -25,7 +25,6 @@ const convertTimestamp = (ts, zone) =>
 
 module.exports = router(
   get('/test', async (req, res) => {
-    await pool.end()
     return 'success'
   }),
   get('/:address', async (req, res) => {
