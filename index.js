@@ -9,7 +9,7 @@ const { router, get } = require('microrouter')
 const { Pool } = require('pg')
 
 const config = require('./config')
-const sqlQuery = require('./query')
+const { transactionsQuery, blocksQuery } = require('./query')
 
 const { getStartOfYear, getEndOfYear } = require('./helper')
 
@@ -35,7 +35,7 @@ module.exports = router(
       `attachment; filename=lisk_txs_${address}_${year}.csv`
     )
 
-    const query = new QueryStream(sqlQuery, [
+    const query = new QueryStream(transactionsQuery, [
       address,
       getStartOfYear(year),
       getEndOfYear(year)
@@ -48,6 +48,34 @@ module.exports = router(
         row.timestamp = convertTimestamp(row.timestamp, timezone)
         row.amount = fromRawLsk(row.amount)
         row.fee = fromRawLsk(row.fee)
+        return row
+      }
+    })
+
+    const client = await pool.connect()
+    return client.query(query).pipe(csvStream)
+  }),
+  get('/delegate/:publicAddress', async (req, res) => {
+    const { publicAddress } = req.params
+    const { delimiter = ';', timezone = 'UTC' } = req.query
+    if (publicAddress.includes('favicon')) return ''
+
+    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=lisk_delegate_blocks.csv`
+    )
+
+    const query = new QueryStream(blocksQuery, [publicAddress])
+
+    const csvStream = csv.createWriteStream({
+      headers: true,
+      objectMode: true,
+      delimiter,
+      transform(row) {
+        row.timestamp = convertTimestamp(row.timestamp, timezone)
+        row.totalfee = fromRawLsk(row.totalfee)
+        row.reward = fromRawLsk(row.reward)
         return row
       }
     })
