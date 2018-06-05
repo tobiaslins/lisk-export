@@ -24,6 +24,9 @@ const convertTimestamp = (ts, zone) =>
     .toFormat('yyyy-MM-dd hh:mm:ss')
 
 module.exports = router(
+  get('/test', async (req, res) => {
+    return 'success'
+  }),
   get('/:address', async (req, res) => {
     const { address } = req.params
     const { delimiter = ';', year = 2018, timezone = 'UTC' } = req.query
@@ -53,7 +56,11 @@ module.exports = router(
     })
 
     const client = await pool.connect()
-    return client.query(query).pipe(csvStream)
+    const stream = client.query(query)
+    stream.on('end', () => {
+      client.release()
+    })
+    return stream.pipe(csvStream)
   }),
   get('/delegate/:publicAddress', async (req, res) => {
     const { publicAddress } = req.params
@@ -81,6 +88,11 @@ module.exports = router(
     })
 
     const client = await pool.connect()
-    return client.query(query).pipe(csvStream)
+    const stream = client.query(query)
+
+    stream.on('end', () => {
+      client.release()
+    })
+    return stream.pipe(csvStream)
   })
 )
