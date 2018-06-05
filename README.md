@@ -27,6 +27,14 @@ Just append the `timezone` parameter with the timezone you are in. You can looku
 https://export.lisk.ws/17890508407355636952L?timezone=Europe/Paris
 ```
 
+#### Delegate Block Export
+
+Public Key is needed for this action.
+
+```
+https://export.lisk.ws/delegate/PUBLICKEYHERE
+```
+
 ### Support me
 
 Of course feel free to support my work by voting for [`elevate`](https://explorer.lisk.io/delegate/17890508407355636952L) or simply donating a small amount! :)
