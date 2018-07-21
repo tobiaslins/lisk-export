@@ -21,7 +21,7 @@ const fromRawLsk = value =>
 const convertTimestamp = (ts, zone) =>
   new DateTime.fromISO(new Date((1464109200 + ts) * 1000).toISOString())
     .setZone(zone)
-    .toFormat('yyyy-MM-dd hh:mm:ss')
+    .toLocaleString(DateTime.DATETIME_SHORT)
 
 module.exports = router(
   get('/test', async (req, res) => {
