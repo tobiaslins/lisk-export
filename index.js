@@ -18,10 +18,14 @@ const pool = new Pool(config)
 const fromRawLsk = value =>
   new BigNumber(value || 0).dividedBy(new BigNumber(10).pow(8)).toFixed()
 
-const convertTimestamp = (ts, zone) =>
-  new DateTime.fromISO(new Date((1464109200 + ts) * 1000).toISOString())
-    .setZone(zone)
-    .toLocaleString(DateTime.DATETIME_SHORT)
+const convertTimestamp = (ts, zone) => {
+  const t = new DateTime.fromISO(
+    new Date((1464109200 + ts) * 1000).toISOString()
+  ).setZone(zone)
+  return `${t.toLocaleString(DateTime.DATE_SHORT)} ${t.toLocaleString(
+    DateTime.TIME_SIMPLE
+  )}`
+}
 
 module.exports = router(
   get('/test', async (req, res) => {
